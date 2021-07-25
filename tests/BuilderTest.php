@@ -8,17 +8,24 @@ use PHPUnit\Framework\TestCase;
 
 class BuilderTest extends TestCase
 {
-    public function testAddRows()
+    /**
+     * @throws BuilderException
+     */
+    public function testAddRows(): void
     {
         $builder = new Builder();
-        $builder->addRow(['age' => 21, 'name' => 'John']);
+        $builder->addRow(
+            [
+                'age'  => 21,
+                'name' => 'John'
+            ]);
 
         $person = new class implements \JsonSerializable {
 
-            function jsonSerialize()
+            public function jsonSerialize(): array
             {
                 return [
-                    'age' => 32,
+                    'age'  => 32,
                     'name' => 'Bill'
                 ];
             }
@@ -27,7 +34,7 @@ class BuilderTest extends TestCase
         $builder->addRow($person);
 
         $table = $builder->getTable();
-        $rows = $table->getRows();
+        $rows  = $table->getRows();
 
         $this->assertEquals(21, $rows[0]->getCell('age')->getValue());
         $this->assertEquals('John', $rows[0]->getCell('name')->getValue());
@@ -36,7 +43,7 @@ class BuilderTest extends TestCase
         $this->assertEquals('Bill', $rows[1]->getCell('name')->getValue());
     }
 
-    public function testAddInvalidRow()
+    public function testAddInvalidRow(): void
     {
         $this->expectException(BuilderException::class);
 
@@ -50,7 +57,7 @@ class BuilderTest extends TestCase
         $builder->addRow($person);
     }
 
-    public function testRenderEmptyTable()
+    public function testRenderEmptyTable(): void
     {
         $this->expectException(BuilderException::class);
 
@@ -58,26 +65,27 @@ class BuilderTest extends TestCase
         $builder->renderTable();
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $builder = new Builder();
-        $builder->addRows([
+        $builder->addRows(
             [
-                'name' => 'John',
-                'age' => 23,
-                'sex' => 'male'
-            ],
-            [
-                'name' => 'Catherine',
-                'age' => 22,
-                'sex' => 'female'
-            ],
-            [
-                'name' => 'Johnathan',
-                'age' => 44,
-                'sex' => 'male'
-            ]
-        ]);
+                [
+                    'name' => 'John',
+                    'age'  => 23,
+                    'sex'  => 'male'
+                ],
+                [
+                    'name' => 'Catherine',
+                    'age'  => 22,
+                    'sex'  => 'female'
+                ],
+                [
+                    'name' => 'Johnathan',
+                    'age'  => 44,
+                    'sex'  => 'male'
+                ]
+            ]);
 
         $result = $builder->renderTable();
 
@@ -94,24 +102,25 @@ EOD;
         $this->assertEquals($expected, $result);
     }
 
-    public function testRenderWithSomeEmptyCells()
+    public function testRenderWithSomeEmptyCells(): void
     {
         $builder = new Builder();
-        $builder->addRows([
+        $builder->addRows(
             [
-                'name' => 'John',
-                'age' => 23,
-                'sex' => 'male'
-            ],
-            [
-                'name' => 'Catherine',
-                'sex' => 'female'
-            ],
-            [
-                'name' => 'Johnathan',
-                'age' => 44,
-            ]
-        ]);
+                [
+                    'name' => 'John',
+                    'age'  => 23,
+                    'sex'  => 'male'
+                ],
+                [
+                    'name' => 'Catherine',
+                    'sex'  => 'female'
+                ],
+                [
+                    'name' => 'Johnathan',
+                    'age'  => 44,
+                ]
+            ]);
 
         $result = $builder->renderTable();
 
@@ -128,28 +137,33 @@ EOD;
         $this->assertEquals($expected, $result);
     }
 
-    public function testShowsOnlyVisibleColumns()
+    public function testShowsOnlyVisibleColumns(): void
     {
         $builder = new Builder();
-        $builder->addRows([
+        $builder->addRows(
             [
-                'name' => 'John',
-                'age' => 23,
-                'sex' => 'male'
-            ],
-            [
-                'name' => 'Catherine',
-                'age' => 22,
-                'sex' => 'female'
-            ],
-            [
-                'name' => 'Johnathan',
-                'age' => 44,
-                'sex' => 'male'
-            ]
-        ]);
+                [
+                    'name' => 'John',
+                    'age'  => 23,
+                    'sex'  => 'male'
+                ],
+                [
+                    'name' => 'Catherine',
+                    'age'  => 22,
+                    'sex'  => 'female'
+                ],
+                [
+                    'name' => 'Johnathan',
+                    'age'  => 44,
+                    'sex'  => 'male'
+                ]
+            ]);
 
-        $builder->showColumns(['name', 'age']);
+        $builder->showColumns(
+            [
+                'name',
+                'age'
+            ]);
         $result = $builder->renderTable();
 
         $expected = <<<EOD
@@ -164,42 +178,44 @@ EOD;
         $this->assertEquals($expected, $result);
     }
 
-    public function testRenderTableWithFloatingPoint()
+    public function testRenderTableWithFloatingPoint(): void
     {
         $builder = new Builder();
-        $builder->addRows([
+        $builder->addRows(
             [
-                'Order No' => 'A0001',
-                'Product Name' => 'Intel CPU',
-                'Price' => 700.00,
-                'Quantity' => 1
-            ],
-            [
-                'Order No' => 'A0002',
-                'Product Name' => 'Hard disk 10TB',
-                'Price' => 500.00,
-                'Quantity' => 2
-            ],
-            [
-                'Order No' => 'A0003',
-                'Product Name' => 'Dell Laptop',
-                'Price' => 11600.00,
-                'Quantity' => 8
-            ],
-            [
-                'Order No' => 'A0004',
-                'Product Name' => 'Intel CPU',
-                'Price' => 5200.00,
-                'Quantity' => 3
-            ]
-        ]);
+                [
+                    'Order No'     => 'A0001',
+                    'Product Name' => 'Intel CPU',
+                    'Price'        => 700.00,
+                    'Quantity'     => 1
+                ],
+                [
+                    'Order No'     => 'A0002',
+                    'Product Name' => 'Hard disk 10TB',
+                    'Price'        => 500.00,
+                    'Quantity'     => 2
+                ],
+                [
+                    'Order No'     => 'A0003',
+                    'Product Name' => 'Dell Laptop',
+                    'Price'        => 11600.00,
+                    'Quantity'     => 8
+                ],
+                [
+                    'Order No'     => 'A0004',
+                    'Product Name' => 'Intel CPU',
+                    'Price'        => 5200.00,
+                    'Quantity'     => 3
+                ]
+            ]);
 
-        $builder->addRow([
-            'Order No' => 'A0005',
-            'Product Name' => 'A4Tech Mouse',
-            'Price' => 100.00,
-            'Quantity' => 10
-        ]);
+        $builder->addRow(
+            [
+                'Order No'     => 'A0005',
+                'Product Name' => 'A4Tech Mouse',
+                'Price'        => 100.00,
+                'Quantity'     => 10
+            ]);
 
         $result = $builder->renderTable();
 
@@ -217,19 +233,20 @@ EOD;
         $this->assertEquals($expected, $result);
     }
 
-    public function testRenderTableWithCyrillicWord()
+    public function testRenderTableWithCyrillicWord(): void
     {
         $builder = new Builder();
-        $builder->addRows([
+        $builder->addRows(
             [
-                'name' => 'John',
-                'age' => 21
-            ],
-            [
-                'name' => 'Иван',
-                'age' => 23
-            ]
-        ]);
+                [
+                    'name' => 'John',
+                    'age'  => 21
+                ],
+                [
+                    'name' => 'Иван',
+                    'age'  => 23
+                ]
+            ]);
 
         $result = $builder->renderTable();
 
@@ -244,19 +261,20 @@ EOD;
         $this->assertEquals($expected, $result);
     }
 
-    public function testRenderWithCyrillicColumnNames()
+    public function testRenderWithCyrillicColumnNames(): void
     {
         $builder = new Builder();
-        $builder->addRows([
+        $builder->addRows(
             [
-                'имя' => 'Джон',
-                'год' => 21
-            ],
-            [
-                'имя' => 'Иван',
-                'год' => 23
-            ]
-        ]);
+                [
+                    'имя' => 'Джон',
+                    'год' => 21
+                ],
+                [
+                    'имя' => 'Иван',
+                    'год' => 23
+                ]
+            ]);
 
         $result = $builder->renderTable();
 
@@ -270,19 +288,21 @@ EOD;
 EOD;
         $this->assertEquals($expected, $result);
     }
-    public function testRenderWithChineseColumnNames()
+
+    public function testRenderWithChineseColumnNames(): void
     {
         $builder = new Builder();
-        $builder->addRows([
+        $builder->addRows(
             [
-                'language' => 'English',
-                'greeting' => 'Hello, World'
-            ],
-            [
-                'language' => 'mixed',
-                'greeting' => 'Hello, 世界'
-            ]
-        ]);
+                [
+                    'language' => 'English',
+                    'greeting' => 'Hello, World'
+                ],
+                [
+                    'language' => 'mixed',
+                    'greeting' => 'Hello, 世界'
+                ]
+            ]);
 
         $result = $builder->renderTable();
 
@@ -297,19 +317,20 @@ EOD;
         $this->assertEquals($expected, $result);
     }
 
-    public function testRenderWithTitle()
+    public function testRenderWithTitle(): void
     {
         $builder = new Builder();
-        $builder->addRows([
+        $builder->addRows(
             [
-                'language' => 'English',
-                'greeting' => 'Hello, World'
-            ],
-            [
-                'language' => 'mixed',
-                'greeting' => 'Hello, 世界'
-            ]
-        ]);
+                [
+                    'language' => 'English',
+                    'greeting' => 'Hello, World'
+                ],
+                [
+                    'language' => 'mixed',
+                    'greeting' => 'Hello, 世界'
+                ]
+            ]);
         $builder->setTitle('Greetings');
 
         $result = $builder->renderTable();

@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class RowTest extends TestCase
 {
-    public function testCellNotDuplicated()
+    public function testCellNotDuplicated(): void
     {
         $row = new Row();
         $row->addCell(new Cell('name', 'John'));

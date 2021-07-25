@@ -16,7 +16,7 @@ interface CellInterface
      *
      * @param mixed $value
      */
-    public function setValue($value);
+    public function setValue(mixed $value);
 
     /**
      * Get the name of the column that the cell belongs to

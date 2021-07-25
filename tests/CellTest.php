@@ -18,14 +18,14 @@ class CellTest extends TestCase
         $this->assertEquals(3, $cell->getWidth());
 
         $ageObject = new class (2008) {
-            private $year;
+            private int $year;
 
-            function __construct(int $year)
+            public function __construct(int $year)
             {
                 $this->year = $year;
             }
 
-            function __toString()
+            public function __toString()
             {
                 return strval(2017 - $this->year);
             }

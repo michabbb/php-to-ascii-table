@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class TableTest extends TestCase
 {
-    public function testSetVisibleColumns()
+    public function testSetVisibleColumns(): void
     {
         $table = new Table();
         $table->setVisibleColumns(['name', 'age', 'location', 'sex']);
@@ -25,7 +25,7 @@ class TableTest extends TestCase
         self::assertEquals(0, $table->getVisibleColumns()->diff($set)->count());
     }
 
-    public function testGetVisibleColumnsWhenNotSet()
+    public function testGetVisibleColumnsWhenNotSet(): void
     {
         $row = new Row();
         $row->addCell(new Cell('name', 'Catherine'));
@@ -38,7 +38,7 @@ class TableTest extends TestCase
         $this->assertSame(['name', 'sex', 'height'], $table->getVisibleColumns()->toArray());
     }
 
-    public function testGetAllColumns()
+    public function testGetAllColumns(): void
     {
         $row = new Row();
         $row->addCell(new Cell('name', 'Bill'));
@@ -61,7 +61,7 @@ class TableTest extends TestCase
         $this->assertSame(['name', 'age', 'sex', 'height'], $table->getAllColumns()->toArray());
     }
 
-    public function testColumnWidth()
+    public function testColumnWidth(): void
     {
         $row = new Row();
         $row->addCell(new Cell('name', 'Jon'));

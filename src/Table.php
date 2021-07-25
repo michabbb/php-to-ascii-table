@@ -10,22 +10,22 @@ class Table implements TableInterface
     /**
      * @var RowInterface[]
      */
-    private $rows = [];
+    private array $rows = [];
 
     /**
      * @var Set
      */
-    private $visibleColumns;
+    private Set $visibleColumns;
 
     /**
      * @var Set
      */
-    private $allColumns;
+    private Set $allColumns;
 
     /**
      * @var Map
      */
-    private $biggestValues;
+    private Map $biggestValues;
 
     public function __construct()
     {
@@ -37,7 +37,7 @@ class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function addRow(RowInterface $row)
+    public function addRow(RowInterface $row):void
     {
         foreach ($row->getCells() as $cell) {
             $columnName = $cell->getColumnName();
@@ -76,7 +76,7 @@ class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function setVisibleColumns(array $columnNames)
+    public function setVisibleColumns(array $columnNames): void
     {
         $this->visibleColumns->clear();
         $this->visibleColumns->allocate(count($columnNames));

@@ -1,81 +1,83 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace AsciiTable;
 
 use AsciiTable\Exception\BuilderException;
 use Ds\Collection;
+use JsonSerializable;
 
 class Builder
 {
     /**
      * @var string
      */
-    const CHAR_CELL_SEPARATOR = '│';
+    public const CHAR_CELL_SEPARATOR = '│';
 
     /**
      * @var string
      */
-    const CHAR_LINE_SEPARATOR = '─';
+    public const CHAR_LINE_SEPARATOR = '─';
 
     /**
      * @var string
      */
-    const CHAR_CELL_PADDING = ' ';
+    public const CHAR_CELL_PADDING = ' ';
 
     /**
      * @var string
      */
-    const CHAR_JOIN_INNER = '┼';
+    public const CHAR_JOIN_INNER = '┼';
 
     /**
      * @var string
      */
-    const CHAR_CORNER_TOP_LEFT = '┌';
+    public const CHAR_CORNER_TOP_LEFT = '┌';
 
     /**
      * @var string
      */
-    const CHAR_CORNER_TOP_RIGHT = '┐';
+    public const CHAR_CORNER_TOP_RIGHT = '┐';
 
     /**
      * @var string
      */
-    const CHAR_JOIN_LEFT_INNER = '├';
+    public const CHAR_JOIN_LEFT_INNER = '├';
 
     /**
      * @var string
      */
-    const CHAR_JOIN_RIGHT_INNER = '┤';
+    public const CHAR_JOIN_RIGHT_INNER = '┤';
 
     /**
      * @var string
      */
-    const CHAR_JOIN_TOP_INNER = '┬';
+    public const CHAR_JOIN_TOP_INNER = '┬';
 
     /**
      * @var string
      */
-    const CHAR_JOIN_BOTTOM_INNER = '┴';
+    public const CHAR_JOIN_BOTTOM_INNER = '┴';
 
     /**
      * @var string
      */
-    const CHAR_CORNER_BOTTOM_LEFT = '└';
+    public const CHAR_CORNER_BOTTOM_LEFT = '└';
 
     /**
      * @var string
      */
-    const CHAR_CORNER_BOTTOM_RIGHT = '┘';
+    public const CHAR_CORNER_BOTTOM_RIGHT = '┘';
 
     /**
      * @var Table
      */
-    private $table;
+    private Table $table;
 
     /**
      * @var string|null
      */
-    private $title;
+    private ?string $title;
 
     public function __construct()
     {
@@ -87,7 +89,7 @@ class Builder
      *
      * @return Table
      */
-    public function getTable() : Table
+    public function getTable(): Table
     {
         return $this->table;
     }
@@ -96,20 +98,22 @@ class Builder
      * Add single row.
      * The value passed should be either an array or an JsonSerializable object
      *
-     * @param array|\JsonSerializable $rowArrayOrObject
+     * @param array|JsonSerializable $rowArrayOrObject
+     *
      * @throws BuilderException
      */
-    public function addRow($rowArrayOrObject)
+    public function addRow($rowArrayOrObject): void
     {
         if (is_array($rowArrayOrObject)) {
             $rowArray = $rowArrayOrObject;
-        } else if ($rowArrayOrObject instanceof \JsonSerializable) {
+        } elseif ($rowArrayOrObject instanceof JsonSerializable) {
             $rowArray = $rowArrayOrObject->jsonSerialize();
         } else {
-            throw new BuilderException(sprintf(
-                'Row must be either an array or JsonSerializable, %s given instead',
-                gettype($rowArrayOrObject)
-            ));
+            throw new BuilderException(
+                sprintf(
+                    'Row must be either an array or JsonSerializable, %s given instead',
+                    gettype($rowArrayOrObject)
+                ));
         }
 
         $row = new Row();
@@ -121,7 +125,7 @@ class Builder
         $this->table->addRow($row);
     }
 
-    public function setTitle(string $title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
@@ -129,10 +133,13 @@ class Builder
     /**
      * Add multiple rows
      *
-     * @param array[]|\JsonSerializable[] $rows
+     * @param array[]|JsonSerializable[] $rows
+     *
      * @return void
+     * @throws BuilderException
+     * @throws BuilderException
      */
-    public function addRows(array $rows)
+    public function addRows(array $rows): void
     {
         foreach ($rows as $row) {
             $this->addRow($row);
@@ -143,10 +150,10 @@ class Builder
      * Show only specific columns of the table
      *
      * @param array $columnNames
+     *
      * @return void
-     * @throws BuilderException
      */
-    public function showColumns(array $columnNames)
+    public function showColumns(array $columnNames): void
     {
         $this->table->setVisibleColumns($columnNames);
     }
@@ -157,63 +164,67 @@ class Builder
      * @return string
      * @throws BuilderException
      */
-    public function renderTable() : string
+    public function renderTable(): string
     {
-        if ($this->table->isEmpty()) throw new BuilderException('Cannot render empty table');
+        if ($this->table->isEmpty()) {
+            throw new BuilderException('Cannot render empty table');
+        }
 
         $visibleColumns = $this->table->getVisibleColumns();
 
         // border for header and footer
-        $borderParts = array_map(function ($columnName) {
-            $width = $this->table->getColumnWidth($columnName);
-            return str_repeat(self::CHAR_LINE_SEPARATOR, ($width + 2));
-        }, $visibleColumns->toArray());
+        $borderParts = array_map(
+            function ($columnName) {
+                $width = $this->table->getColumnWidth($columnName);
+                return str_repeat(self::CHAR_LINE_SEPARATOR, ($width + 2));
+            }, $visibleColumns->toArray());
 
-        $borderTop = self::CHAR_CORNER_TOP_LEFT
-                . join(self::CHAR_JOIN_TOP_INNER, $borderParts)
-                . self::CHAR_CORNER_TOP_RIGHT;
+        $borderTop    = self::CHAR_CORNER_TOP_LEFT
+                        . implode(self::CHAR_JOIN_TOP_INNER, $borderParts)
+                        . self::CHAR_CORNER_TOP_RIGHT;
         $borderMiddle = self::CHAR_JOIN_LEFT_INNER
-                . join(self::CHAR_JOIN_INNER, $borderParts)
-                . self::CHAR_JOIN_RIGHT_INNER;
+                        . implode(self::CHAR_JOIN_INNER, $borderParts)
+                        . self::CHAR_JOIN_RIGHT_INNER;
         $borderBottom = self::CHAR_CORNER_BOTTOM_LEFT
-                . join(self::CHAR_JOIN_BOTTOM_INNER, $borderParts)
-                . self::CHAR_CORNER_BOTTOM_RIGHT;
+                        . implode(self::CHAR_JOIN_BOTTOM_INNER, $borderParts)
+                        . self::CHAR_CORNER_BOTTOM_RIGHT;
 
-        $headerCells = array_map(function ($columnName) {
-            return new Cell($columnName, $columnName);
-        }, $visibleColumns->toArray());
+        $headerCells = array_map(
+            static function ($columnName) {
+                return new Cell($columnName, $columnName);
+            }, $visibleColumns->toArray());
 
         $headerRow = new Row();
         $headerRow->addCells(...$headerCells);
         $header = $this->renderRow($headerRow, $visibleColumns);
 
-        $body = '';
-        $rows = $this->table->getRows();
+        $body           = '';
+        $rows           = $this->table->getRows();
         $visibleColumns = $this->table->getVisibleColumns();
         foreach ($rows as $row) {
             $currentLine = $this->renderRow($row, $visibleColumns);
-            $body .= $currentLine . PHP_EOL;
+            $body        .= $currentLine . PHP_EOL;
         }
 
         if ($this->title === null) {
             $titleString = '';
         } else {
             $titlePadding = intdiv(max(0, mb_strwidth($borderTop) - mb_strwidth($this->title)), 2);
-            $titleString = str_repeat(' ', $titlePadding) . $this->title . PHP_EOL;
+            $titleString  = str_repeat(' ', $titlePadding) . $this->title . PHP_EOL;
         }
 
-        $tableAsString = $titleString . $borderTop . PHP_EOL . $header . PHP_EOL . $borderMiddle . PHP_EOL . $body . $borderBottom;
-        return $tableAsString;
+        return $titleString . $borderTop . PHP_EOL . $header . PHP_EOL . $borderMiddle . PHP_EOL . $body . $borderBottom;
     }
 
     /**
      * Render single row and return string
      *
      * @param RowInterface $row
-     * @param Collection $columnNames
+     * @param Collection   $columnNames
+     *
      * @return string
      */
-    private function renderRow(RowInterface $row, Collection $columnNames)
+    private function renderRow(RowInterface $row, Collection $columnNames): string
     {
         $line = self::CHAR_CELL_SEPARATOR;
 
@@ -221,7 +232,7 @@ class Builder
         foreach ($columnNames as $columnName) {
             $colWidth = $this->table->getColumnWidth($columnName);
             if ($row->hasCell($columnName)) {
-                $cell = $row->getCell($columnName);
+                $cell        = $row->getCell($columnName);
                 $currentCell = $this->renderCell($cell, $colWidth);
             } else {
                 $currentCell = $this->renderCell(new Cell($columnName, ''), $colWidth);
@@ -237,13 +248,14 @@ class Builder
      * Render cell content with left and right padding depending on the column width
      *
      * @param CellInterface $cell
-     * @param int $colWidth
+     * @param int           $colWidth
+     *
      * @return string
      */
-    private function renderCell(CellInterface $cell, int $colWidth) : string
+    private function renderCell(CellInterface $cell, int $colWidth): string
     {
         $filler = str_repeat(self::CHAR_CELL_PADDING, ($colWidth - $cell->getWidth()));
-        if ($cell->getAlign() == Cell::ALIGN_LEFT) {
+        if ($cell->getAlign() === Cell::ALIGN_LEFT) {
             $content = self::CHAR_CELL_PADDING . $cell->getValue() . $filler . self::CHAR_CELL_PADDING;
         } else {
             $content = self::CHAR_CELL_PADDING . $filler . $cell->getValue() . self::CHAR_CELL_PADDING;

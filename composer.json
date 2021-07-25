@@ -1,5 +1,5 @@
 {
-    "name": "malios/php-to-ascii-table",
+    "name": "macropage/php-to-ascii-table",
     "description": "A PHP library to generate plain text tables.",
     "type": "library",
     "keywords": [
@@ -16,9 +16,10 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7",
+        "php": "^8.0 || ^8.1",
         "php-ds/php-ds": "^1.1",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "@stable",

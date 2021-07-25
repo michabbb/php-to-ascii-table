@@ -2,15 +2,12 @@
 
 namespace AsciiTable;
 
-use Ds\Map;
 use Ds\Collection;
+use Ds\Map;
 
 class Row implements RowInterface
 {
-    /**
-     * @var Map
-     */
-    private $cells;
+    private Map $cells;
 
     public function __construct()
     {
@@ -20,7 +17,7 @@ class Row implements RowInterface
     /**
      * {@inheritdoc}
      */
-    public function addCell(CellInterface $cell)
+    public function addCell(CellInterface $cell): void
     {
         $this->cells->put($cell->getColumnName(), $cell);
     }
@@ -28,7 +25,7 @@ class Row implements RowInterface
     /**
      * {@inheritdoc}
      */
-    public function addCells(CellInterface ...$cells)
+    public function addCells(CellInterface ...$cells):void
     {
         foreach ($cells as $cell) {
             $this->addCell($cell);
